@@ -34,7 +34,7 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
 
 def calculate_mse(e):
     """Calculate the mse for vector e."""
-    return 1 / 2 * np.mean(e**2)
+    return 1 / 2 * np.mean(e**2) # 0.5 factor as in Lessons
 
 def calculate_mae(e):
     """Calculate the mae for vector e."""
