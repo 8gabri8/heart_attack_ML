@@ -11,18 +11,19 @@ We decided to use cony "calculted vriables" because
     - they are considered good indicatior of HT by the clinciacians/the guy wh made the sudy
         cite"s. Thecommon focus of these variables is on health behaviors that are associated with a risk of illness or injury" https://www.cdc.gov/brfss/annual_data/2015/pdf/2015_Calculated_Variables_Version4_08_10_17-508c.pdf
 
-We decided to also add:
+We decided to also add cols:
     -
 
 We decied to remove the cols with more than % of NaN, as they will not be useful for classification
+
+We removed cols with high correlation
+We mantined columns highly corrected with response variable
 
 .
 ## Exploratory data analysis 
 - only use column with >thr of NaN
 - explore column 
     - what columsn means (https://www.cdc.gov/brfss/annual_data/2015/pdf/codebook15_llcp.pdf)
-    - distirbution (zhuofu)
-    - percentage of NaN in each col
     - other EDA steps (gabri)
 
 - feautre selection
@@ -49,6 +50,8 @@ fearture enegerirng
 - differt inital guesses of w
 - differt gamma for GD
 - use differnt optimizer Adam, momentum ...
+- differnt normlaization technies
+- differt subsets of features
 - use other losses
 - use other models: RF
 
