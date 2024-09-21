@@ -1,7 +1,6 @@
 import numpy as np
-from my_functions import calculate_mse, compute_gradient
-from my_functions import calculate_mse, compute_gradient,batch_iter, compute_loss
-from my_functions import calculate_mae, compute_gradient
+from functions.my_functions import *
+
 
 def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """Gradient Descent for Mean Squared Error (MSE).
@@ -82,4 +81,59 @@ def mean_squared_error_sgd(y, tx, initial_w, max_iters, gamma):
         )
 
     return w, loss  # Return the final weights and loss
+
+def least_squares(y, tx):
+    """Calculate the least squares solution.
+       Returns mse and optimal weights.
+
+    Args:
+        y: numpy array of shape (N,), N is the number of samples.
+        tx: numpy array of shape (N,D), D is the number of features.
+
+    Returns:
+        w: optimal weights, numpy array of shape (D,), D is the number of features.
+        mse: scalar, mse loss
+    """
+    #optimal weights w using the normal equation: w = (XtX)^(-1)Xty <--> (XtX)w = Xty
+    a = tx.T.dot(tx)
+    b = tx.T.dot(y)
+    w = np.linalg.solve(a, b) # Solve the linear equation Ax = b
+    mse = compute_loss(y, tx, w) #mse
+    return w, mse
+
+def ridge_regression(y, tx, lambda_):
+    """Implement ridge regression using the normal equation.
+
+    Args:
+        y: numpy array of shape (N,), N is the number of samples.
+        tx: numpy array of shape (N, D), D is the number of features.
+        lambda_: scalar regularization parameter.
+
+    Returns:
+        w: optimal weights, numpy array of shape (D,), D is the number of features.
+        loss: Mean Squared Error, scalar.
+    """
+    # Number of samples and features
+    N, D = tx.shape
+    
+    # Identity matrix for regularization term
+    aI = lambda_ * np.identity(D)
+    
+    # Normal equation components
+    a = tx.T.dot(tx) + aI
+    b = tx.T.dot(y)
+    
+    # Solve for weights
+    w = np.linalg.solve(a, b)
+    
+    # Compute the loss (mse)
+    loss = compute_loss(y, tx, w)
+
+    return w, loss
+
+
+
+
+
+
 

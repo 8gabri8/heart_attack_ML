@@ -165,3 +165,67 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, 
         )
 
     return w, loss  # Return the final weights and loss
+
+
+def pca(x_train, variance_threshold):
+    """Perform PCA on the given dataset and return components that explain
+    at least the specified percentage of variance.
+
+    Args:
+        x_train (np.ndarray): Input data, shape (N, D) where N is the number of samples and D is the number of features.
+        variance_threshold (float): The desired percentage of variance to be explained (0 to 1).
+
+    Returns:
+        np.ndarray: The transformed data, shape (N, k) where k is the number of components selected.
+        np.ndarray: The eigenvalues, shape (D,).
+        np.ndarray: The eigenvectors, shape (D, D).
+    """
+    # Step 1: Center the data
+    x_centered = x_train - np.mean(x_train, axis=0)
+
+    # Step 2: Compute the covariance matrix
+    covariance_matrix = np.cov(x_centered, rowvar=False)
+
+    # Step 3: Eigen decomposition
+    eigenvalues, eigenvectors = np.linalg.eigh(covariance_matrix)
+
+    # Step 4: Sort the eigenvalues and eigenvectors
+    sorted_indices = np.argsort(eigenvalues)[::-1]  # Indices of eigenvalues in descending order
+    sorted_eigenvalues = eigenvalues[sorted_indices]
+    sorted_eigenvectors = eigenvectors[:, sorted_indices]
+
+    # Step 5: Calculate the explained variance
+    explained_variance = sorted_eigenvalues / np.sum(sorted_eigenvalues)
+    
+    # Step 6: Cumulative explained variance
+    cumulative_variance = np.cumsum(explained_variance)
+
+    # Step 7: Determine the number of components to retain
+    num_components = np.argmax(cumulative_variance >= variance_threshold) + 1
+
+    # Step 8: Project the data onto the selected principal components
+    selected_eigenvectors = sorted_eigenvectors[:, :num_components]
+    x_transformed = np.dot(x_centered, selected_eigenvectors)
+
+    return x_transformed
+
+def build_poly(x, degree):
+    """Generate polynomial basis functions for input data x, for j=0 up to j=degree.
+
+    Args:
+        x (np.ndarray): Input data of shape (N, D) where N is the number of samples and D is the number of features.
+        degree (int): The maximum degree of polynomial features to generate.
+
+    Returns:
+        np.ndarray: Polynomial feature matrix of shape (N, D * degree + 1).
+    """
+    N, D = x.shape  # Number of samples and features
+    poly = np.ones((N, 1))  # Start with the bias term (degree 0)
+
+    for deg in range(1, degree + 1):
+        for feature_index in range(D):
+            # Compute polynomial features for each feature
+            poly_feature = np.power(x[:, feature_index], deg)
+            poly = np.c_[poly, poly_feature]
+
+    return poly

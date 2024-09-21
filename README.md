@@ -52,6 +52,7 @@ fearture enegerirng
 - use differnt optimizer Adam, momentum ...
 - differnt normlaization technies
 - differt subsets of features
+- try use w0 (columns with all 1s)
 - use other losses
 - use other models: RF
 
