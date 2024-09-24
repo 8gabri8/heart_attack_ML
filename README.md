@@ -19,6 +19,8 @@ We decied to remove the cols with more than % of NaN, as they will not be useful
 We removed cols with high correlation
 We mantined columns highly corrected with response variable
 
+IN CONTINOUS VARIBALES CHNAGE THE VALUE OF THE "MISSING" CATEGORY (9999000 CAN SCREW THE NORMALIZATION )
+
 .
 ## Exploratory data analysis 
 - only use column with >thr of NaN

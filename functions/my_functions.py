@@ -166,7 +166,6 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, 
 
     return w, loss  # Return the final weights and loss
 
-
 def pca(x_train, variance_threshold):
     """Perform PCA on the given dataset and return components that explain
     at least the specified percentage of variance.
@@ -229,3 +228,33 @@ def build_poly(x, degree):
             poly = np.c_[poly, poly_feature]
 
     return poly
+
+def compute_f1_score(y_true, y_pred):
+    """
+    Computes the F1 score given the true and predicted labels.
+    
+    Args:
+        y_true (np.array): Array of true labels (-1 or 1)
+        y_pred (np.array): Array of predicted labels (-1 or 1)
+    
+    Returns:
+        float: F1 score
+    """
+    # Calculate True Positives (TP), False Positives (FP), and False Negatives (FN)
+    tp = np.sum((y_pred == 1) & (y_true == 1))
+    fp = np.sum((y_pred == 1) & (y_true == -1))
+    fn = np.sum((y_pred == -1) & (y_true == 1))
+
+    # Calculate Precision and Recall
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+
+    # Calculate F1 score
+    f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+    
+    return f1_score
+
+
+
+
+
