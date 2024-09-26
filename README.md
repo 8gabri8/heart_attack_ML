@@ -7,6 +7,8 @@ TRY IMPLEMENT SVM
 
 ATTEMTION IN OGISTC REGRESSOON LABELS MUST BE (0.1)
 
+If your dataset contains many more negative samples than positive ones, a model that always predicts the positive class could achieve a high F1 score (for the positive class) while having low accuracy, because it's misclassifying most of the negative samples.
+
 # Column/feature selection
 We wanted to reduce the number of features to avoid curse od dimentisonlity
 
@@ -64,6 +66,7 @@ fearture enegerirng
 - use other models: RF
 - logstic regression with sthichstic gd
 - logistic regression with newtorn method
+- try differt inital_w
 
 # testing locally on validation ONOTEHR is test on aicrowd
 

@@ -340,3 +340,51 @@ def calculate_loss_grad_penalized_logistic_regression(y, tx, w, lambda_):
     loss = calculate_loss_logistic_regression(y, tx, w) + lambda_ * np.sum(w**2)  # L2 penalty
     gradient = calculate_gradient_logistic_regression(y, tx, w) + 2 * lambda_ * w  # L2 regularization term
     return loss, gradient
+
+class SVM:
+    def __init__(self, learning_rate=0.001, lambda_param=0.01, n_iters=1000):
+        self.learning_rate = learning_rate   # Learning rate for gradient descent
+        self.lambda_param = lambda_param     # Regularization parameter
+        self.n_iters = n_iters               # Number of iterations for SGD
+        self.w = None                        # Weight vector (will be initialized later)
+        self.b = 0                           # Bias term
+    
+    def fit(self, X, y):
+        n_samples, n_features = X.shape
+
+        # Initialize the weight vector to zeros
+        self.w = np.zeros(n_features)
+        self.b = 0
+        
+        # Convert the labels to -1 and 1 if they are not in this format
+        y_ = np.where(y <= 0, -1, 1)  # Ensures labels are -1 or 1
+        
+        # Gradient descent (SGD)
+        for _ in range(self.n_iters):
+            for idx, x_i in enumerate(X):
+                # Calculate the condition for hinge loss
+                condition = y_[idx] * (np.dot(x_i, self.w) + self.b)
+                
+                if condition >= 1:
+                    # No misclassification, only update w using regularization
+                    dw = 2 * self.lambda_param * self.w
+                    self.w -= self.learning_rate * dw
+                else:
+                    # Misclassified sample, update w and b
+                    dw = 2 * self.lambda_param * self.w - np.dot(x_i, y_[idx])
+                    self.w -= self.learning_rate * dw
+                    self.b -= self.learning_rate * y_[idx]
+
+    def predict(self, X):
+        # Linear decision boundary: y = w^T x + b
+        linear_output = np.dot(X, self.w) + self.b
+        # Return the predicted labels (either -1 or 1)
+        return np.sign(linear_output)
+
+
+
+
+
+
+
+

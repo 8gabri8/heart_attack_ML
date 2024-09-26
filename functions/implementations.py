@@ -162,7 +162,7 @@ def logistic_regression(y, tx, initial_w, max_iters, gamma):
         w = w - gamma * grad
         
         # Print progress (optional)
-        print(f"Iteration {n_iter+1}/{max_iters}, Loss: {loss}, Weights: {w.flatten()}")
+        print(f"Iteration {n_iter+1}/{max_iters}, Gradient: {grad}, Loss: {loss}, Weights: {w.flatten()}")
     
     # Return the final weights and the final loss value
     return w, loss
