@@ -254,7 +254,89 @@ def compute_f1_score(y_true, y_pred):
     
     return f1_score
 
+def sigmoid(t):
+    """apply sigmoid function on t.
 
+    Args:
+        t: scalar or numpy array
 
+    Returns:
+        scalar or numpy array
+    """
 
+    return 1.0 / (1 + np.exp(-t))
 
+def calculate_loss_logistic_regression(y, tx, w):
+    """
+    Compute the cost using the negative log-likelihood (binary cross-entropy loss)
+    for logistic regression.
+
+    Args:
+        y (ndarray): Labels vector of shape (N, 1), where N is the number of samples.
+                     Each entry in y should be either 0 or 1, representing class labels.
+        tx (ndarray): Feature matrix of shape (N, D), where N is the number of samples
+                      and D is the number of features. Each row corresponds to the
+                      features of one sample.
+        w (ndarray): Weight vector of shape (D, 1), where D is the number of features.
+                     Represents the model parameters (weights) in logistic regression.
+
+    Returns:
+        float: A non-negative scalar representing the average negative log-likelihood 
+               (i.e., the binary cross-entropy loss) over all samples.
+               Lower values indicate a better model fit to the data.
+
+    Notes:
+        The negative log-likelihood (binary cross-entropy) is computed as:
+            L(w) = - (1/N) * [y.T * log(sigmoid(tx @ w)) + (1 - y).T * log(1 - sigmoid(tx @ w))]
+        where:
+            - sigmoid(z) = 1 / (1 + exp(-z)) is the logistic function.
+            - '@' represents matrix multiplication.
+
+    """
+
+    assert y.shape[0] == tx.shape[0], "The number of samples in y and tx must match."
+    assert tx.shape[1] == w.shape[0], "The number of features in tx must match the size of w."
+
+    pred = sigmoid(tx.dot(w))  # Predicted probabilities using the sigmoid function
+    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))  # Negative log-likelihood
+    return np.squeeze(-loss).item() * (1 / y.shape[0])  # Average loss over all samples
+
+def calculate_gradient_logistic_regression(y, tx, w):
+    """
+    Compute the gradient of the binary cross-entropy loss (negative log-likelihood)
+    with respect to the weight vector `w` for logistic regression.
+
+    Args:
+        y (ndarray): Labels vector of shape (N, 1), where N is the number of samples.
+                     Each entry in `y` should be either 0 or 1, representing class labels.
+        tx (ndarray): Feature matrix of shape (N, D), where N is the number of samples
+                      and D is the number of features. Each row corresponds to the
+                      features of one sample.
+        w (ndarray): Weight vector of shape (D, 1), where D is the number of features.
+                     Represents the model parameters (weights) in logistic regression.
+
+    Returns:
+        ndarray: A gradient vector of shape (D, 1), representing the partial derivatives
+                 of the loss with respect to each element in `w`. This is used to update
+                 the weights during optimization.
+
+    Notes:
+        The gradient of the binary cross-entropy loss for logistic regression is computed as:
+            ∇L(w) = (1/N) * tx.T @ (sigmoid(tx @ w) - y)
+        where:
+            - sigmoid(z) = 1 / (1 + exp(-z)) is the logistic (sigmoid) function.
+            - '@' represents matrix multiplication.
+    """
+    # Ensure the shapes of y, tx, and w are compatible
+    assert y.shape[0] == tx.shape[0], "The number of samples in y and tx must match."
+    assert tx.shape[1] == w.shape[0], "The number of features in tx must match the size of w."
+
+    pred = sigmoid(tx.dot(w))  # Predicted probabilities using the sigmoid function
+    grad = tx.T.dot(pred - y) * (1 / y.shape[0])  # Compute gradient
+    return grad
+
+def calculate_loss_grad_penalized_logistic_regression(y, tx, w, lambda_):
+    """Calculate the penalized loss and gradient for logistic regression."""
+    loss = calculate_loss_logistic_regression(y, tx, w) + lambda_ * np.sum(w**2)  # L2 penalty
+    gradient = calculate_gradient_logistic_regression(y, tx, w) + 2 * lambda_ * w  # L2 regularization term
+    return loss, gradient

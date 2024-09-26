@@ -131,7 +131,73 @@ def ridge_regression(y, tx, lambda_):
 
     return w, loss
 
+def logistic_regression(y, tx, initial_w, max_iters, gamma):
+    """
+    Perform logistic regression using gradient descent.
 
+    Args:
+        y (ndarray): Labels vector of shape (N, 1), where N is the number of samples.
+                     Each entry in `y` should be either 0 or 1, representing class labels.
+        tx (ndarray): Feature matrix of shape (N, D), where N is the number of samples
+                      and D is the number of features. Each row corresponds to the
+                      features of one sample.
+        initial_w (ndarray): Initial weights of shape (D, 1), where D is the number of features.
+        max_iters (int): The number of iterations for the gradient descent algorithm.
+        gamma (float): The learning rate, which controls the step size in gradient descent.
+
+    Returns:
+        tuple: (w, loss), where:
+            - w (ndarray): The final weight vector after training, shape (D, 1).
+            - loss (float): The final value of the binary cross-entropy loss.
+    """
+    # Initialize weights
+    w = initial_w
+
+    for n_iter in range(max_iters):
+        # Compute the gradient and the loss
+        grad = calculate_gradient_logistic_regression(y, tx, w)
+        loss = calculate_loss_logistic_regression(y, tx, w)
+        
+        # Update the weights using the gradient
+        w = w - gamma * grad
+        
+        # Print progress (optional)
+        print(f"Iteration {n_iter+1}/{max_iters}, Loss: {loss}, Weights: {w.flatten()}")
+    
+    # Return the final weights and the final loss value
+    return w, loss
+
+def reg_logistic_regression(y, tx, initial_w, max_iters, gamma, lambda_):
+    """
+    Perform logistic regression using gradient descent with L2 regularization.
+
+    Args:
+        y (ndarray): Labels vector of shape (N, 1).
+        tx (ndarray): Feature matrix of shape (N, D).
+        initial_w (ndarray): Initial weights of shape (D, 1).
+        max_iters (int): The number of iterations for gradient descent.
+        gamma (float): The learning rate.
+        lambda_ (float): The regularization parameter for L2 regularization.
+
+    Returns:
+        tuple: (w, loss), where:
+            - w (ndarray): The final weight vector after training, shape (D, 1).
+            - loss (float): The final value of the penalized binary cross-entropy loss.
+    """
+    # Initialize weights
+    w = initial_w
+
+    for n_iter in range(max_iters):
+        # Compute the loss and gradient
+        loss, gradient = calculate_loss_grad_penalized_logistic_regression(y, tx, w, lambda_)
+
+        # Update the weights using the gradient
+        w -= gamma * gradient
+        
+        # Print progress (optional)
+        print(f"Iteration {n_iter + 1}/{max_iters}, Loss: {loss:.4f}, Weights: {w.flatten()}")
+
+    return w, loss
 
 
 

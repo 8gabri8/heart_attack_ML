@@ -2,6 +2,11 @@
 
 The documentation must also include all data preparation, feature generation as well as cross-validation steps that you have used
 
+PARSER FOR THE INPUT FOLDER WTH DATA (PUT ALSO IN THE DOCUMENTATION)
+TRY IMPLEMENT SVM
+
+ATTEMTION IN OGISTC REGRESSOON LABELS MUST BE (0.1)
+
 # Column/feature selection
 We wanted to reduce the number of features to avoid curse od dimentisonlity
 
@@ -57,6 +62,8 @@ fearture enegerirng
 - try use w0 (columns with all 1s)
 - use other losses
 - use other models: RF
+- logstic regression with sthichstic gd
+- logistic regression with newtorn method
 
 # testing locally on validation ONOTEHR is test on aicrowd
 
