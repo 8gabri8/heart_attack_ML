@@ -1,6 +1,5 @@
 import numpy as np
-from functions.my_functions import *
-
+from functions.implementations_helper import *
 
 def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """Gradient Descent for Mean Squared Error (MSE).

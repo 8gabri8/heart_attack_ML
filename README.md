@@ -4,7 +4,7 @@ cheu"k" fu(cantonise) --> big trustable
         LOGIST (zhuofu)
         LINEAR AND LEAST SQUARE (gabri)
         SVM
-    - PLOTS (sofiia)
+    - PLOTS (sofiia) --> LOOK DONW!!!!
     - TESTS FUNcTION (zhuofo)
     - TRY COMPETITION (gabri)
     - LATEX (sofiia)
@@ -21,7 +21,8 @@ PARSER FOR THE INPUT FOLDER WTH DATA (PUT ALSO IN THE DOCUMENTATION)
 
 # PLOTS (sofiia)
 - PUT THE ROC CRUVE PLOT
-- CORRELATION VAR
+- CORRELATION VAR 
+- VIF VAIBLES
 - hist  (before inputing, after imputing and withou nan_class)
 - SCATTERPLOTS for continuops
 - other ideas
@@ -37,6 +38,8 @@ ATTEMTION IN OGISTC REGRESSOON LABELS MUST BE (0.1)
 - can we roemeve rows from the daatset
 - does the run.py shoduld run only the best run that we have created or give the possibilty fo runnign everything we have done??
 - the graphs/plots shoduld be created from the run file? also the oen of EDA?
+- can w3e use the library Json to load and upload file?
+- how to chosse the best model in corss validation? the one with bigger accuracy or F1? how?
 
 
 # compettite evaluation
