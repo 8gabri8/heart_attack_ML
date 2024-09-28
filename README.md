@@ -1,13 +1,33 @@
-# heart_attack_ML
-
-The documentation must also include all data preparation, feature generation as well as cross-validation steps that you have used
-
+# CHECK FUNTISON WITH THERI CODE
+# ENROLL IN GITCLASSROOM
+# WRITE READ ME
 PARSER FOR THE INPUT FOLDER WTH DATA (PUT ALSO IN THE DOCUMENTATION)
-TRY IMPLEMENT SVM
+# 
 
+# IDEAS
+- TRY IMPLEMENT SVM
+- differt inital guesses of w
+- differt gamma for GD
+- use differnt optimizer Adam, momentum ...
+- differnt normlaization technies
+- differt subsets of features
+- try use w0 (columns with all 1s)
+- use other losses
+- use other models: RF
+- logstic regression with sthichstic gd
+- logistic regression with newtorn method
+- try differt inital_w
+
+# ATTENTION
 ATTEMTION IN OGISTC REGRESSOON LABELS MUST BE (0.1)
 
-If your dataset contains many more negative samples than positive ones, a model that always predicts the positive class could achieve a high F1 score (for the positive class) while having low accuracy, because it's misclassifying most of the negative samples.
+# QUESTIONS
+- how to solve class imbalance, cut some data?
+    - If your dataset contains many more negative samples than positive ones, a model that always predicts the positive class could achieve a high F1 score (for the positive class) while having low accuracy, because it's misclassifying most of the negative samples.
+- what put in the final report, the crossvalidation metrics on x_train, or the results of the challenge
+- can we roemeve rows from the daatset
+
+
 
 # Column/feature selection
 We wanted to reduce the number of features to avoid curse od dimentisonlity
@@ -51,22 +71,6 @@ fearture enegerirng
     - PCA
     - combinaing features ex. polynomial
 
-
-
-# heck fucntions with the test of proposed by the TAs
-
-# Train
-- differt inital guesses of w
-- differt gamma for GD
-- use differnt optimizer Adam, momentum ...
-- differnt normlaization technies
-- differt subsets of features
-- try use w0 (columns with all 1s)
-- use other losses
-- use other models: RF
-- logstic regression with sthichstic gd
-- logistic regression with newtorn method
-- try differt inital_w
 
 # testing locally on validation ONOTEHR is test on aicrowd
 
