@@ -38,8 +38,8 @@ def main():
 
     ONLY_FEATURE_TO_USE = [""]  
     SUGGESTED_FEATURE_PATH = "data/suggested_features_dict.json"  # Path to the JSON file containing suggested features
-    NORMALIZATION_METHOD = "minmax"  # Method to normalize continuous features during preprocessing
-    FEATURE_ENGENEERING_TYPE = 2  # Type of feature assembly during feature engineering (see process_data function for details)
+    NORMALIZATION_METHOD = "z-score"  # Method to normalize continuous features during preprocessing
+    FEATURE_ENGENEERING_TYPE = 1  # Type of feature assembly during feature engineering (see process_data function for details)
     THR_VAR_PCA = 0.9  # Percentage of variance to retain during PCA
     MAX_NAN_PER_COL = 0.75  # Max percentage of NaNs in one column before removal
     PREDICTION_METHOD = "least_squares"  # Prediction method (see training_function.py for options)
@@ -54,11 +54,11 @@ def main():
                         "_PNEUMO2", "_RACEGR3", "_RFBING5", "_RFHYPE5", "_SMOKER3", 
                         "_ASTHMS1", "_CHOLCHK", "_DRDXAR1", "_EDUCAG", "_FRT16",#continous
 
-                        'DROCDY3_', 'FRUTDA1_', '_FRUTSUM', '_VEGESUM', 'GRENDAY_', 
-                        'METVL11_', 'METVL21_', 'ORNGDAY_', 'PA1MIN_', 'PA1VIGM_', 
-                        'PADUR1_', 'PADUR2_', 'PAFREQ1_', 'PAFREQ2_', 'PAMIN11_', 
-                        'PAMIN21_', 'PAVIG11_', 'PAVIG21_', 'VEGEDA1_', '_AGE80', 
-                        '_BMI5', '_DRNKWEK' #discrete
+                        #'DROCDY3_', 'FRUTDA1_', '_FRUTSUM', '_VEGESUM', 'GRENDAY_', 
+                        #'METVL11_', 'METVL21_', 'ORNGDAY_', 'PA1MIN_', 'PA1VIGM_', 
+                        #'PADUR1_', 'PADUR2_', 'PAFREQ1_', 'PAFREQ2_', 'PAMIN11_', 
+                        #'PAMIN21_', 'PAVIG11_', 'PAVIG21_', 'VEGEDA1_', '_AGE80', 
+                        #'_BMI5', '_DRNKWEK' #discrete
                     ]# with the features suggested by physicinas, subset of uncorrelated ones (see EDA analysis on how they have been choosen)
 
 

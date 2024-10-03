@@ -1,4 +1,8 @@
 from functions.implementations import *
+from numpy.lib import recfunctions as rfn
+import matplotlib.pyplot as plt 
+
+
 
 class SVM:
     def __init__(self, learning_rate=0.001, lambda_param=0.01, n_iters=1000):
@@ -44,14 +48,14 @@ def process_train_data(
     x_train,
     feature_name,  # Features (column names) of the x_train matrix
     data_dict,     # Dict where keys are feature names, and values are lists: [nan symbol, feature type ('continuous' or 'discrete')]
-    uncorrelated_features, # Feature that can be used beacuse they are uncorrelated
+    specific_features, # Subset of feauture to use, ignoring all the others
     thr_nan=0.75,  # Threshold above which the column will be discarded (default: 75% NaN)
     thr_var_pca = 0.9, # Percentage of varaince to save during pca
     normalization="minmax",  # Type of normalization for continuous variables
     degree_pol = 3, # Max degree of feature polinomial expansion
-    specific_features = ["_AGE80", "_BMI5"], # Subset of feauture to use, ignoring all the others
-    feature_engeneering_type=1,  # Feature engineering option (default: use only continuous variables)
-    is_train = True, # If the data is prepocessed for training (in that case some columns are removed)
+    feature_engeneering_type="all",  # Feature engineering option (default: use only continuous variables)
+    is_train_set = True,
+    plot_distributions = False
 ):
     """
     Process training data by handling missing values, normalizing continuous features, and performing feature engineering.
@@ -103,18 +107,18 @@ def process_train_data(
     structured_array_x_train = structured_array_x_train[selected_features]
 
     #############################
-    # Within the remaining features use only the one that are uncorrelated
+    # Select features decided by the user (check that they are also in the filtered dataset) 
     #############################
 
-    if is_train:
-        print("\tRemoving highly correlated features...")
-        structured_array_x_train = structured_array_x_train[uncorrelated_features]
+    print("\tFiltering columns decided by users...")
+    structured_array_x_train = rfn.repack_fields(structured_array_x_train[specific_features])
+    print(structured_array_x_train.shape)
 
     #############################
     # Remove columns with too many NaNs
     #############################
 
-    if is_train:
+    if is_train_set:
         print("\tRemoving columns with too many NaNs...")
         threshold = thr_nan * structured_array_x_train.shape[0]  # Threshold for NaNs
         columns_to_keep = [name for name in structured_array_x_train.dtype.names 
@@ -122,14 +126,6 @@ def process_train_data(
         
         # Filter the structured array
         structured_array_x_train = structured_array_x_train[columns_to_keep]
-
-    #############################
-    # Remove columns with too many NaNs
-    #############################
-
-    if not is_train: # so is test
-        # use the same colusmn use din train, passed by the user
-        pass
 
     ###########################
     # Impute missing values
@@ -167,6 +163,29 @@ def process_train_data(
     nan_columns = [col_name for col_name in cols_name if np.isnan(structured_array_x_train[col_name]).any()]
     print(f"\t\tColumns with NaN values: {nan_columns}")
 
+    ############################
+    # Show diestrubton Afetr imputing missign values
+    #############################
+
+    if plot_distributions:
+        # Determine the number of columns and feature names
+        num_columns = len(structured_array_x_train.dtype.names)
+        feature_names = structured_array_x_train.dtype.names
+
+        # Create subplots for each column's histogram
+        fig, axes = plt.subplots(num_columns, 1, figsize=(10, 4 * num_columns))
+
+        for i in range(num_columns):
+            axes[i].hist(structured_array_x_train[feature_names[i]], bins=150, alpha=0.7, color='blue', edgecolor='black')
+            axes[i].set_title(f'Histogram of {feature_names[i]}')
+            axes[i].set_xlabel('Value')
+            axes[i].set_ylabel('Frequency')
+            axes[i].grid(True)
+            axes[i].set_yscale('log')
+
+        plt.tight_layout()
+        plt.show()
+
     #################################
     # Split continuous and discrete columns
     #################################
@@ -179,6 +198,8 @@ def process_train_data(
     # Split into two matrices
     x_train_dis = structured_array_x_train[discrete_keys]
     x_train_con = structured_array_x_train[continous_keys]
+    print(f"x_train discrete size: {x_train_dis.size}")
+    print(f"x_train continous size: {x_train_con.size}")
 
     ###############################
     # Encode discrete variables
@@ -217,7 +238,7 @@ def process_train_data(
 
     print("\tNormalizing continuous variables...")
 
-    x_train_con_norm = x_train_con.copy()
+    x_train_con_norm =  x_train_con.copy()
 
     for col_name in x_train_con_norm.dtype.names:
         column = x_train_con_norm[col_name]
@@ -236,6 +257,10 @@ def process_train_data(
             q1, q3 = np.nanpercentile(column, [25, 75])
             iqr = q3 - q1
             column = (column - median_value) / iqr
+        elif normalization == "log":
+            column = np.log(column + 1)  # Adding 1 to avoid log(0)
+        elif normalization == "none":
+            column = column
 
         x_train_con_norm[col_name] = column
 
@@ -248,26 +273,26 @@ def process_train_data(
     use = feature_engeneering_type
 
     # Convert ot normal numpy array
-    x_train_con_np = np.column_stack([x_train_con_norm[field] for field in x_train_con_norm.dtype.names])
-    x_train_dis_np =  np.column_stack([x_train_dis_enc[field] for field in x_train_dis_enc.dtype.names])
+    if x_train_con_norm.size != 0:
+        x_train_con_np = np.column_stack([x_train_con_norm[field] for field in x_train_con_norm.dtype.names])
+    if x_train_dis_enc.size != 0:
+        x_train_dis_np =  np.column_stack([x_train_dis_enc[field] for field in x_train_dis_enc.dtype.names])
 
-    if use == 0: # All features
+    if use == "all": # All features
         x_train_final = np.concatenate([x_train_con_np, x_train_dis_np], axis=1)
-    elif use == 1: # Only continous
+    elif use == "all_con": # Only continous
         x_train_final = x_train_con_np
-    elif use == 2: # Only discrete
+    elif use == "all_disc": # Only discrete
         x_train_final = x_train_dis_np
-    elif use == 3: # Only continous, with pca
+    elif use == "pca_only_con": # Only continous, with pca
         x_train_pca = pca(x_train_con_np, variance_threshold=thr_var_pca)
         x_train_final = x_train_pca
-    elif use == 4: # Only continuos, with polynomial expansion
+    elif use == "poly_only_con": # Only continuos, with polynomial expansion
         x_train_final = build_poly(x_train_con_np, degree=3)
-    elif use == 5: # All features, with polynomial expansion
+    elif use == "poly_all": # All features, with polynomial expansion
         x_train_final = np.concatenate([build_poly(x_train_con_np, degree=degree_pol), x_train_dis_np], axis=1)
-    elif use == 6: #Only continuos, with constant col
+    elif use == "const_only_con": #Only continuos, with constant col
         x_train_final = np.c_[np.ones((x_train_con_np.shape[0], 1)), x_train_con_np]
-    elif use == 7: #Only specific cols
-        x_train_final = x_train_con_norm[specific_features]
     else:
         raise ValueError("Invalid option for 'use'.")
     
@@ -469,7 +494,7 @@ def stratified_k_fold_cross_validation(
         print("\n")
 
         # Update best model if current validation accuracy is better
-        if val_accuracy > best_accuracy:
+        if val_f1_score > best_f1_score:
             best_accuracy = val_accuracy
             best_f1_score = val_f1_score
             best_w = w
@@ -486,5 +511,181 @@ def stratified_k_fold_cross_validation(
 
 
 
+def process_train_data_only_continous(
+    x_train,
+    feature_name,  # Features (column names) of the x_train matrix
+    data_dict,     # Dict where keys are feature names, and values are lists: [nan symbol, feature type ('continuous' or 'discrete')]
+    specific_features, # Subset of feauture to use, ignoring all the others
+    thr_nan=0.75,  # Threshold above which the column will be discarded (default: 75% NaN)
+    thr_var_pca = 0.9, # Percentage of varaince to save during pca
+    normalization="minmax",  # Type of normalization for continuous variables
+    degree_pol = 3, # Max degree of feature polinomial expansion
+    feature_engeneering_type="all",  # Feature engineering option (default: use only continuous variables)
+):
 
+    #############################
+    # Create Structured array
+    #############################
+
+    print("\tCreating structured array...")
+
+    # Give names to columns of the numpy array and define their data types
+    dtype = [(name, x_train.dtype) for name in feature_name]  
+
+    # Create the structured array for x_train
+    structured_array_x_train = np.zeros(x_train.shape[0], dtype)
+
+    # Assign each column from x_train to the structured array
+    for i, name in enumerate(feature_name):
+        structured_array_x_train[name] = x_train[:, i]
+
+    #############################
+    # Select subset of columns based of physician experties
+    #############################
+
+    print("\tSelecting features suggested by physicians...")
+
+    # Get the names of the features we want to use
+    selected_features = list(data_dict.keys())
+
+    # Filter to only the selected columns
+    structured_array_x_train = rfn.repack_fields(structured_array_x_train[selected_features])
+
+    #############################
+    # Select features decided by the user (check that they are also in the filtered dataset) 
+    #############################
+
+    print("\tFiltering columns decided by users...")
+    structured_array_x_train = rfn.repack_fields(structured_array_x_train[specific_features])
+    print(structured_array_x_train.shape)
+
+    #############################
+    # Remove columns with too many NaNs
+    #############################
+
+    print("\tRemoving columns with too many NaNs...")
+    threshold = thr_nan * structured_array_x_train.shape[0]  # Threshold for NaNs
+    columns_to_keep = [name for name in structured_array_x_train.dtype.names 
+                    if np.sum(np.isnan(structured_array_x_train[name])) <= threshold]
+    
+    # Filter the structured array
+    structured_array_x_train = structured_array_x_train[columns_to_keep]
+
+    ###########################
+    # Impute missing values
+    ###########################
+
+    print("\tImputing missing values...")
+    
+    cols_name = structured_array_x_train.dtype.names
+    for i, col_name in enumerate(cols_name):
+        try:
+            col_info = data_dict[col_name]
+        except KeyError:
+            print(f"Column {col_name} not found in the dictionary.")
+            continue
+
+        type_feature = col_info[1]
+        nan_symbol = col_info[0]
+        col_data = structured_array_x_train[col_name]
+
+        if type_feature == "continous":
+            col_data[col_data == nan_symbol] = np.nan  # Replace nan_symbol with np.nan
+            mean_value = np.nanmean(col_data)
+            col_data[np.isnan(col_data)] = mean_value  # Impute missing with mean
+
+        elif type_feature == "discrete":
+            if nan_symbol == "nan":
+                col_data[np.isnan(col_data)] = -1  # Replace NaN with -1
+            elif nan_symbol != "no_missing":
+                col_data[col_data == nan_symbol] = nan_symbol  # Replace with predefined missing value
+                col_data[np.isnan(col_data)] = nan_symbol
+
+        structured_array_x_train[col_name] = col_data
+
+    # Check for columns with remaining NaNs
+    nan_columns = [col_name for col_name in cols_name if np.isnan(structured_array_x_train[col_name]).any()]
+    print(f"\t\tColumns with NaN values: {nan_columns}")
+
+        ############################
+    # Show diestrubton Afetr imputing missign values
+    #############################
+
+    # Determine the number of columns and feature names
+    num_columns = len(structured_array_x_train.dtype.names)
+    feature_names = structured_array_x_train.dtype.names
+
+    # Create subplots for each column's histogram
+    fig, axes = plt.subplots(num_columns, 1, figsize=(10, 4 * num_columns))
+
+    for i in range(num_columns):
+        axes[i].hist(structured_array_x_train[feature_names[i]], bins=150, alpha=0.7, color='blue', edgecolor='black')
+        axes[i].set_title(f'Histogram of {feature_names[i]}')
+        axes[i].set_xlabel('Value')
+        axes[i].set_ylabel('Frequency')
+        axes[i].grid(True)
+        axes[i].set_yscale('log')
+
+    plt.tight_layout()
+    plt.show()
+
+
+    ###############################
+    # Normalize continuous variables
+    ###############################
+
+    print("\tNormalizing continuous variables...")
+
+    x_train_con_norm = structured_array_x_train.copy()
+
+    for col_name in x_train_con_norm.dtype.names:
+        column = x_train_con_norm[col_name]
+        mean_value = np.nanmean(column)
+        column[np.isnan(column)] = mean_value  # Fill NaNs with the mean
+
+        if normalization == "minmax":
+            min_value = np.min(column)
+            max_value = np.max(column)
+            column = (column - min_value) / (max_value - min_value)
+        elif normalization == "z-score":
+            std_value = np.nanstd(column)
+            column = (column - mean_value) / std_value
+        elif normalization == "robust_scalar":
+            median_value = np.nanmedian(column)
+            q1, q3 = np.nanpercentile(column, [25, 75])
+            iqr = q3 - q1
+            column = (column - median_value) / iqr
+        elif normalization == "none":
+            column = column
+
+        x_train_con_norm[col_name] = column
+
+    ###############################
+    # Feature engineering
+    ###############################
+
+    print("\tFeature engineering...")
+    
+    use = feature_engeneering_type
+
+    # Convert ot normal numpy array
+    x_train_con_np = np.column_stack([x_train_con_norm[field] for field in x_train_con_norm.dtype.names])
+
+    if use == "all": # Only continous
+        x_train_final = x_train_con_np
+    elif use == "pca": # pca
+        x_train_pca = pca(x_train_con_np, variance_threshold=thr_var_pca)
+        x_train_final = x_train_pca
+    elif use == "poly": # with polynomial expansion
+        x_train_final = build_poly(x_train_con_np, degree=3)
+    elif use == "ones_col": #with constant col
+        x_train_final = np.c_[np.ones((x_train_con_np.shape[0], 1)), x_train_con_np]
+    else:
+        raise ValueError("Invalid option for 'use'.")
+    
+    # Convert structured array to a regular NumPy array
+    #x_train_final = np.column_stack([x_train_final[field] for field in x_train_final.dtype.names])
+
+    print(f"\tReturning Processed features, shape {x_train_final.shape}...")
+    return x_train_final
 
