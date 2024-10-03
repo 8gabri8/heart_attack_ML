@@ -33,15 +33,24 @@ ATTEMTION IN OGISTC REGRESSOON LABELS MUST BE (0.1)
 
 # QUESTIONS FOR TAs
 - how to solve class imbalance, cut some data?
+answer: he is not allowed to answer) it is the first main challange for the project to solve  he recommended to try some regularisatoin or aother approaches)
     - shoould I train on a subsample of the data?
+	answer: try)
     - If your dataset contains many more negative samples than positive ones, a model that always predicts the positive class could achieve a high F1 score (for the positive class) while having low accuracy, because it's misclassifying most of the negative samples.
 - what put in the final report, the crossvalidation metrics on x_train, or the results of the challenge
+answer: both
 - can we roemeve rows from the daatset
+answer: try)
 - does the run.py shoduld run only the best run that we have created or give the possibilty fo runnign everything we have done??
+answer: only final
 - the graphs/plots shoduld be created from the run file? also the oen of EDA?
-- can w3e use the library Json to load and upload file?
+answer: he said it should be fine. i would ask in the forum
+- can w3e use the library Json to load and upload file? 
+answer: ask in the edforum
 - how to chosse the best model in corss validation? the one with bigger accuracy or F1? how?
-- what means if I have beg labfas (10^8) in ridge is this possbile?
+answer: check the theory, should be f1
+- what means if I have big labdas (10^8) in ridge is this possbile? 
+answer: you probably really penelise the model (or opposite), you should try different parameters.
 
 
 # compettite evaluation
