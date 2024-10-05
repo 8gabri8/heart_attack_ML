@@ -1,6 +1,6 @@
 import numpy as np
-from my_functions import calculate_mae, compute_gradient
-from my_functions import calculate_mae, compute_gradient, batch_iter, compute_loss
+from functions.implementations_helper import calculate_mae, compute_gradient
+from functions.implementations_helper import calculate_mae, compute_gradient, batch_iter, compute_loss
 
 
 def mean_absolute_error_gd(y, tx, initial_w, max_iters, gamma):

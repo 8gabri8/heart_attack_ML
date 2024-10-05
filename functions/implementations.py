@@ -1,6 +1,5 @@
 import numpy as np
-from functions.my_functions import *
-
+from functions.implementations_helper import *
 
 def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
     """Gradient Descent for Mean Squared Error (MSE).
@@ -32,8 +31,8 @@ def mean_squared_error_gd(y, tx, initial_w, max_iters, gamma):
         loss = calculate_mse(err)
 
         print(
-            "GD iter. {bi}/{ti}: loss={l}, w0={w0}, w1={w1}".format(
-                bi=n_iter + 1, ti=max_iters, l=loss, w0=w[0], w1=w[1]
+            "GD iter. {bi}/{ti}: loss={l}, weights={w}".format(
+                bi=n_iter + 1, ti=max_iters, l=loss, w=w
             )
         )
 
