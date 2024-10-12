@@ -1,6 +1,11 @@
 import numpy as np
 from functions.implementations_helper import calculate_mae, compute_gradient
-from functions.implementations_helper import calculate_mae, compute_gradient, batch_iter, compute_loss
+from functions.implementations_helper import (
+    calculate_mae,
+    compute_gradient,
+    batch_iter,
+    compute_loss,
+)
 
 
 def mean_absolute_error_gd(y, tx, initial_w, max_iters, gamma):
@@ -27,7 +32,7 @@ def mean_absolute_error_gd(y, tx, initial_w, max_iters, gamma):
 
         # Update weights
         w = w - gamma * grad
-        
+
         # Calculate loss (MAE)
         loss = calculate_mae(err)
 
@@ -38,6 +43,7 @@ def mean_absolute_error_gd(y, tx, initial_w, max_iters, gamma):
         )
 
     return w, loss  # Return the final weights and loss
+
 
 def mean_absolute_error_sgd(y, tx, initial_w, max_iters, gamma):
     """The Stochastic Gradient Descent algorithm (SGD) for linear model.
@@ -64,15 +70,17 @@ def mean_absolute_error_sgd(y, tx, initial_w, max_iters, gamma):
     loss_type = "mae"
 
     for n_iter in range(max_iters):
-        
-        for y_batch, tx_batch in batch_iter(y, tx, batch_size=batch_size, num_batches=1):
-            
+
+        for y_batch, tx_batch in batch_iter(
+            y, tx, batch_size=batch_size, num_batches=1
+        ):
+
             # Compute stochastic gradient and loss
             grad, _ = compute_gradient(y_batch, tx_batch, w, loss_type)
 
             # Update w through the stochastic gradient update
             w = w - gamma * grad
-            
+
             # Calculate loss for the current weights
             loss = compute_loss(y_batch, tx_batch, w, loss_type)
 

@@ -2,6 +2,7 @@ import numpy as np
 
 # Useful functions from Labs and necessary for the implementations.py file (6 required functions)
 
+
 def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
     """
     Create a minibatch iterator for a dataset.
@@ -14,7 +15,7 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         shuffle: If True, shuffle data before splitting into batches.
 
     Returns:
-        A generator yielding tuples (minibatch_y, minibatch_tx), where each batch contains 
+        A generator yielding tuples (minibatch_y, minibatch_tx), where each batch contains
         `batch_size` samples, except possibly the last batch.
     """
 
@@ -34,13 +35,17 @@ def batch_iter(y, tx, batch_size, num_batches=1, shuffle=True):
         if start_index != end_index:
             yield shuffled_y[start_index:end_index], shuffled_tx[start_index:end_index]
 
+
 def calculate_mse(e):
     """Calculate the mse for vector e."""
-    return 1 / 2 * np.mean(e**2) # 0.5 factor as in Lessons
+    N = len(e)
+    return 1 / (2 * N) * np.sum(e**2)  # 0.5 factor as in Lessons
+
 
 def calculate_mae(e):
     """Calculate the mae for vector e."""
     return np.mean(np.abs(e))
+
 
 def compute_loss(y, tx, w, loss_type="mse"):
     """Calculate the loss of a linear model using either MSE or MAE.
@@ -54,13 +59,14 @@ def compute_loss(y, tx, w, loss_type="mse"):
     Returns:
         the value of the loss (a scalar), corresponding to the input parameters w.
     """
-    e = y - tx.dot(w) # label - prediction of the linear model
+    e = y - tx.dot(w)  # label - prediction of the linear model
     if loss_type == "mse":
         return calculate_mse(e)
     elif loss_type == "mae":
         return calculate_mae(e)
     else:
         raise ValueError("Invalid loss_type. Choose 'mse' or 'mae'.")
+
 
 def compute_gradient(y, tx, w, loss_type="mse"):
     """Computes the gradient at w for either MSE or MAE loss.
@@ -77,15 +83,16 @@ def compute_gradient(y, tx, w, loss_type="mse"):
             - err: The error vector (shape=(N,)).
     """
     err = y - tx.dot(w)
-    
+
     if loss_type == "mse":
-        grad = -tx.T.dot(err) / len(err) # -(1/N)X^t(e)
+        grad = -tx.T.dot(err) / len(err)  # -(1/N)X^t(e)
     elif loss_type == "mae":
-        grad = -tx.T.dot(np.sign(err)) / len(err) # -(1/N)X^t sign(e)
+        grad = -tx.T.dot(np.sign(err)) / len(err)  # -(1/N)X^t sign(e)
     else:
         raise ValueError("Invalid loss_type. Choose 'mse' or 'mae'.")
-    
+
     return grad, err  # Return as a tuple
+
 
 def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_type="mse"):
     """The Gradient Descent (GD) algorithm.
@@ -109,7 +116,7 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_type="mse"):
     for n_iter in range(max_iters):
         # Compute loss and gradient
         grad, err = compute_gradient(y, tx, w, loss_type)
-        
+
         # Compute loss based on the selected loss type
         if loss_type == "mse":
             loss = calculate_mse(err)
@@ -129,7 +136,10 @@ def gradient_descent(y, tx, initial_w, max_iters, gamma, loss_type="mse"):
 
     return w, loss  # Return the final weights and loss
 
-def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, loss_type="mse"):
+
+def stochastic_gradient_descent(
+    y, tx, initial_w, batch_size, max_iters, gamma, loss_type="mse"
+):
     """The Stochastic Gradient Descent algorithm (SGD) for linear model.
 
     Args:
@@ -150,13 +160,15 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, 
     w = initial_w
 
     for n_iter in range(max_iters):
-        
-        for y_batch, tx_batch in batch_iter(y, tx, batch_size=batch_size, num_batches=1):
+
+        for y_batch, tx_batch in batch_iter(
+            y, tx, batch_size=batch_size, num_batches=1
+        ):
             # Compute stochastic gradient and loss
             grad, _ = compute_gradient(y_batch, tx_batch, w, loss_type)
             # Update w through the stochastic gradient update
             w = w - gamma * grad
-            
+
             # Calculate loss for the current weights
             loss = compute_loss(y_batch, tx_batch, w, loss_type)
 
@@ -167,6 +179,7 @@ def stochastic_gradient_descent(y, tx, initial_w, batch_size, max_iters, gamma, 
         )
 
     return w, loss  # Return the final weights and loss
+
 
 def pca(x_train, variance_threshold):
     """Perform PCA on the given dataset and return components that explain
@@ -191,13 +204,15 @@ def pca(x_train, variance_threshold):
     eigenvalues, eigenvectors = np.linalg.eigh(covariance_matrix)
 
     # Step 4: Sort the eigenvalues and eigenvectors
-    sorted_indices = np.argsort(eigenvalues)[::-1]  # Indices of eigenvalues in descending order
+    sorted_indices = np.argsort(eigenvalues)[
+        ::-1
+    ]  # Indices of eigenvalues in descending order
     sorted_eigenvalues = eigenvalues[sorted_indices]
     sorted_eigenvectors = eigenvectors[:, sorted_indices]
 
     # Step 5: Calculate the explained variance
     explained_variance = sorted_eigenvalues / np.sum(sorted_eigenvalues)
-    
+
     # Step 6: Cumulative explained variance
     cumulative_variance = np.cumsum(explained_variance)
 
@@ -209,6 +224,7 @@ def pca(x_train, variance_threshold):
     x_transformed = np.dot(x_centered, selected_eigenvectors)
 
     return x_transformed
+
 
 def build_poly(x, degree):
     """Generate polynomial basis functions for input data x, for j=0 up to j=degree.
@@ -231,14 +247,15 @@ def build_poly(x, degree):
 
     return poly
 
+
 def compute_f1_score(y_true, y_pred):
     """
     Computes the F1 score given the true and predicted labels.
-    
+
     Args:
         y_true (np.array): Array of true labels (-1 or 1)
         y_pred (np.array): Array of predicted labels (-1 or 1)
-    
+
     Returns:
         float: F1 score
     """
@@ -252,9 +269,14 @@ def compute_f1_score(y_true, y_pred):
     recall = tp / (tp + fn) if (tp + fn) > 0 else 0
 
     # Calculate F1 score
-    f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-    
+    f1_score = (
+        2 * (precision * recall) / (precision + recall)
+        if (precision + recall) > 0
+        else 0
+    )
+
     return f1_score
+
 
 def compute_confusion_matrix(y_true, y_pred):
     """
@@ -276,6 +298,7 @@ def compute_confusion_matrix(y_true, y_pred):
 
     return matrix
 
+
 def sigmoid(t):
     """apply sigmoid function on t.
 
@@ -287,6 +310,7 @@ def sigmoid(t):
     """
 
     return 1.0 / (1 + np.exp(-t))
+
 
 def calculate_loss_logistic_regression(y, tx, w):
     """
@@ -303,9 +327,7 @@ def calculate_loss_logistic_regression(y, tx, w):
                      Represents the model parameters (weights) in logistic regression.
 
     Returns:
-        float: A non-negative scalar representing the average negative log-likelihood 
-               (i.e., the binary cross-entropy loss) over all samples.
-               Lower values indicate a better model fit to the data.
+        return the loss of logistic regression, scalar.
 
     Notes:
         The negative log-likelihood (binary cross-entropy) is computed as:
@@ -317,11 +339,16 @@ def calculate_loss_logistic_regression(y, tx, w):
     """
 
     assert y.shape[0] == tx.shape[0], "The number of samples in y and tx must match."
-    assert tx.shape[1] == w.shape[0], "The number of features in tx must match the size of w."
+    assert (
+        tx.shape[1] == w.shape[0]
+    ), "The number of features in tx must match the size of w."
 
     pred = sigmoid(tx.dot(w))  # Predicted probabilities using the sigmoid function
-    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(np.log(1 - pred))  # Negative log-likelihood
-    return np.squeeze(-loss).item() * (1 / y.shape[0])  # Average loss over all samples
+    loss = y.T.dot(np.log(pred)) + (1 - y).T.dot(
+        np.log(1 - pred)
+    )  # Negative log-likelihood
+    return np.squeeze(-loss) * (1 / y.shape[0])  # Average loss over all samples
+
 
 def calculate_gradient_logistic_regression(y, tx, w):
     """
@@ -351,21 +378,29 @@ def calculate_gradient_logistic_regression(y, tx, w):
     """
     # Ensure the shapes of y, tx, and w are compatible
     assert y.shape[0] == tx.shape[0], "The number of samples in y and tx must match."
-    assert tx.shape[1] == w.shape[0], "The number of features in tx must match the size of w."
+    assert (
+        tx.shape[1] == w.shape[0]
+    ), "The number of features in tx must match the size of w."
 
     pred = sigmoid(tx.dot(w))  # Predicted probabilities using the sigmoid function
     grad = tx.T.dot(pred - y) * (1 / y.shape[0])  # Compute gradient
     return grad
 
+
 def calculate_loss_grad_penalized_logistic_regression(y, tx, w, lambda_):
     """Calculate the penalized loss and gradient for logistic regression."""
-    loss = calculate_loss_logistic_regression(y, tx, w) + lambda_ * np.sum(w**2)  # L2 penalty
-    gradient = calculate_gradient_logistic_regression(y, tx, w) + 2 * lambda_ * w  # L2 regularization term
+    loss = calculate_loss_logistic_regression(y, tx, w)  # penalized only for
+    gradient = (
+        calculate_gradient_logistic_regression(y, tx, w) + 2 * lambda_ * w
+    )  # L2 regularization term
     return loss, gradient
 
-def lasso_with_adam_optimizer(y, tx, initial_w, max_iters, alpha=0.01, lambda_lasso=0.1):
+
+def lasso_with_adam_optimizer(
+    y, tx, initial_w, max_iters, alpha=0.01, lambda_lasso=0.1
+):
     """Performs optimization using Adam with Lasso regularization.
-    
+
     Args:
         y (np.array): Labels (target values), shape=(N,).
         tx (np.array): Input data (features), shape=(N, D).
@@ -380,36 +415,41 @@ def lasso_with_adam_optimizer(y, tx, initial_w, max_iters, alpha=0.01, lambda_la
     """
     m = len(y)  # Number of samples
     w = initial_w.copy()
-    
+
     # Initialize Adam parameters
     m_t = np.zeros_like(w)
     v_t = np.zeros_like(w)
     t = 0
-    
+
     for i in range(max_iters):
         t += 1
-        
+
         # Compute the gradient
         error = y - np.dot(tx, w)
         gradient = -np.dot(tx.T, error) / m  # Gradient for the loss
         # Add Lasso regularization term
         gradient += lambda_lasso * np.sign(w)  # Lasso regularization
-        
+
         # Update biased first and second moment estimates
         m_t = 0.9 * m_t + 0.1 * gradient
         v_t = 0.999 * v_t + 0.001 * gradient**2
-        
+
         # Compute bias-corrected first and second moment estimates
         m_hat = m_t / (1 - 0.9**t)
         v_hat = v_t / (1 - 0.999**t)
-        
+
         # Update weights
-        w -= alpha * m_hat / (np.sqrt(v_hat) + 1e-8)  # Epsilon added for numerical stability
-        
+        w -= (
+            alpha * m_hat / (np.sqrt(v_hat) + 1e-8)
+        )  # Epsilon added for numerical stability
+
     # Calculate the final loss (mean squared error with Lasso)
-    loss = np.mean(error**2) + lambda_lasso * np.sum(np.abs(w))  # Loss including Lasso regularization
-    
+    loss = np.mean(error**2) + lambda_lasso * np.sum(
+        np.abs(w)
+    )  # Loss including Lasso regularization
+
     return w, loss
+
 
 def calculate_vif(X):
     vif = []
@@ -417,29 +457,33 @@ def calculate_vif(X):
         # Select the current feature and all others
         y = X[:, i]
         X_others = np.delete(X, i, axis=1)  # Remove the current feature
-        
+
         # Calculate R-squared for this feature
         b = np.linalg.lstsq(X_others, y, rcond=None)[0]
         y_pred = X_others @ b
         residual_sum_of_squares = np.sum((y - y_pred) ** 2)
         total_sum_of_squares = np.sum((y - np.mean(y)) ** 2)
-        
+
         R_squared = 1 - (residual_sum_of_squares / total_sum_of_squares)
-        vif.append(1 / (1 - R_squared) if R_squared < 1 else np.inf)  # Avoid division by zero
+        vif.append(
+            1 / (1 - R_squared) if R_squared < 1 else np.inf
+        )  # Avoid division by zero
 
     return np.array(vif)
 
+
 def remove_duplicate_columns_structured(structured_array):
     # Extract the data from the structured array and transpose it
-    transposed_data = structured_array.view(np.dtype((np.record, structured_array.shape[1]))).T
-    
+    transposed_data = structured_array.view(
+        np.dtype((np.record, structured_array.shape[1]))
+    ).T
+
     # Identify unique rows (which correspond to unique columns in the original structured array)
     unique_rows, unique_indices = np.unique(transposed_data, axis=0, return_index=True)
-    
+
     # Create a new structured array with only unique columns
-    unique_columns_structured = structured_array[[structured_array.dtype.names[i] for i in unique_indices]]
+    unique_columns_structured = structured_array[
+        [structured_array.dtype.names[i] for i in unique_indices]
+    ]
 
     return unique_columns_structured
-
-
-
